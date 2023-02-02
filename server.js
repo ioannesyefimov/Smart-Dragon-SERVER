@@ -8,17 +8,25 @@ const register = require('./controlers/register')
 const signIn = require('./controlers/signIn')
 const profile = require('./controlers/profile')
 const image = require('./controlers/image')
-
 const db = knex({
     client: 'pg',
     connection: {
-        host: 'dpg-cfdokvg2i3mmlo3f07v0-a.oregon-postgres.render.com',
+        host: process.env.DATABASE_URL,
         user: 'ioannes',
         password: '0zPYmyCblEf9sSOJuZOM6QUXMxDeUHU3',
-        database: 'smart_dragon'
+        database: 'smart_dragon',
+        ssl: true
     }
 });
 
+
+db.raw("SELECT 1").then(() => {
+    console.log("PostgreSQL connected");
+})
+.catch((e) => {
+    console.log("PostgreSQL not connected");
+    console.error(e);
+});
 
 
 
