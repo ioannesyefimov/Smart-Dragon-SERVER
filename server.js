@@ -11,7 +11,7 @@ const image = require('./controlers/image')
 const db = knex({
     client: 'pg',
     connection: {
-        host: process.env.DATABASE_URL,
+        host: "dpg-cfdokvg2i3mmlo3f07v0-a.oregon-postgres.render.com",
         user: 'ioannes',
         password: '0zPYmyCblEf9sSOJuZOM6QUXMxDeUHU3',
         database: 'smart_dragon',
