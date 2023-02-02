@@ -12,10 +12,10 @@ const image = require('./controlers/image')
 const db = knex({
     client: 'pg',
     connection: {
-        host: '127.0.0.1',
-        user: 'postgres',
-        password: 'ioannes',
-        database: 'smart-dragon'
+        host: 'dpg-cfdokvg2i3mmlo3f07v0-a.oregon-postgres.render.com',
+        user: 'ioannes',
+        password: '0zPYmyCblEf9sSOJuZOM6QUXMxDeUHU3',
+        database: 'smart_dragon'
     }
 });
 
@@ -41,6 +41,8 @@ app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res,db)})
 
 app.put('/image', (req,res) => {image.handleImage(req,res, db)});
 
-app.listen(3000, ()=>{
-    console.log('app is running on port 3000')
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, ()=>{
+    console.log(`app is running on port ${PORT}`)
 })
