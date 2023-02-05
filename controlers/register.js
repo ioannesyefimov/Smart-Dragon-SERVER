@@ -1,6 +1,8 @@
 
 const saltRounds = 10
-
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
 const handleRegister = (req, res, db, bcrypt) => {
     const { email, name, password} = req.body;
@@ -21,8 +23,9 @@ const handleRegister = (req, res, db, bcrypt) => {
                 .returning('*')
                 .insert({
                     email: loginEmail[0].email,
-                    name: name,
-                    joined: new Date()
+                    name: capitalizeFirstLetter(name),
+                    joined: new Date(),
+                    rank: 'newbie'
                 })
                 .then(user => {
                     res.json(user[0])
@@ -36,5 +39,6 @@ const handleRegister = (req, res, db, bcrypt) => {
 }
 
 module.exports = {
-    handleRegister: handleRegister
+    handleRegister: handleRegister,
+    capitalizeFirstLetter: capitalizeFirstLetter,
 }

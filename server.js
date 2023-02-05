@@ -45,9 +45,10 @@ app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcry
 app.post('/imageurl', (req, res) => {image.handleApiCall(req, res)})
         
 
-app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res,db)})
+app.get('/profile/:name', (req, res) => { profile.handleProfileGet(req, res,db)})
 
 app.put('/image', (req,res) => {image.handleImage(req,res, db)});
+app.put('/rank', (req, res)=> {profile.handleRank(req,res,db)})
 
 const PORT = process.env.PORT || 3000
 
