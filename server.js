@@ -46,6 +46,7 @@ app.post('/imageurl', (req, res) => {image.handleApiCall(req, res)})
         
 
 app.get('/profile/:username', (req, res) => { profile.handleProfileGet(req, res,db)})
+app.delete('/profile/settings', (req, res)=> {profile.deleteUser(req,res,db, bcrypt)})
 
 app.put('/image', (req,res) => {image.handleImage(req,res, db)});
 app.put('/rank', (req, res)=> {profile.handleRank(req,res,db)})

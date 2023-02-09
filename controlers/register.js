@@ -1,12 +1,10 @@
 
 const saltRounds = 10
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
-const passwordErrors = {
-    INVALID: `password is not valid`,
-    CONTAINS_NAME: `password must not contain users input`
+const Errors = {
+    INVALID_PASSWORD: `Password must be in English and contains at least one uppercase and lowercase character, one number, and one special character`,
+    PASSWORD_CONTAINS_NAME: `password must not contain users input`,
+    USER_EXIST: 'User already exists, try another username'
     
 }
 
@@ -50,25 +48,26 @@ function validatePassword(password,name) {
       const isValidPassword = password_rgx.test(password)
     
     if((hasNamePatternInPassword != -1) ){
-        return passwordErrors.CONTAINS_NAME
+        return Errors.PASSWORD_CONTAINS_NAME
     } else if(isValidPassword === true) {
-        return passwordErrors.INVALID
+        return Errors.INVALID_PASSWORD
     }
     
 }
 
 
 const handleRegister = (req, res, db, bcrypt) => {
-    const { email, name, password} = req.body;
+    const { email, username, password} = req.body;
 
 
     const hash = bcrypt.hashSync(password, saltRounds);
-    if((!email || !name || !password )){
+    
+    if((!email || !username || !password )){
         return res.status(400).json('incorrect form submission')
-    } else if (validatePassword(password, name) == passwordErrors.INVALID){
-        return res.status(400).json('Password must be in English and contains at least one uppercase and lowercase character, one number, and one special character')
-    } else if(validatePassword(password, name) == passwordErrors.CONTAINS_NAME){
-        return res.status(400).json(JSON.stringify(passwordErrors.CONTAINS_NAME))
+    } else if (validatePassword(password, username) == Errors.INVALID_PASSWORD){
+        return res.status(400).json(Errors.INVALID_PASSWORD)
+    } else if(validatePassword(password, username) == Errors.PASSWORD_CONTAINS_NAME){
+        return res.status(400).json(JSON.stringify(Errors.PASSWORD_CONTAINS_NAME))
 
     }
         db.transaction(trx=> {
@@ -83,7 +82,7 @@ const handleRegister = (req, res, db, bcrypt) => {
                 .returning('*')
                 .insert({
                     email: loginEmail[0].email,
-                    username: capitalizeFirstLetter(name),
+                    username: username.toLowerCase(),
                     joined: new Date(),
                     rank: 'newbie'
                 })
@@ -94,11 +93,10 @@ const handleRegister = (req, res, db, bcrypt) => {
         .then(trx.commit)
         .catch(trx.rollback)
     })
-    .catch(err => res.status(400).json('unable to register'))
+    .catch(err => res.status(400).json(Errors.USER_EXIST))
     
 }
 
 module.exports = {
     handleRegister: handleRegister,
-    capitalizeFirstLetter: capitalizeFirstLetter,
 }

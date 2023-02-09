@@ -1,8 +1,7 @@
-const register = require('./register')
 const handleProfileGet =(req, res, db)=> {
     const { username } = req.params;
     db.select('*').from('users').where({
-        name:  register.capitalizeFirstLetter(username)
+        username:  username
     })
     .then(user => {
         if(user.length == 1) {
@@ -40,7 +39,7 @@ const handleRankByEntries = (entries) => {
     }
 }
 
-const handleRank = (req, res, db) =>{
+const handleRank = (req, res, db, bcrypt) =>{
     const {entries, email} = req.body 
     db('users')
     .where('email', '=', email)
@@ -55,7 +54,41 @@ const handleRank = (req, res, db) =>{
         })
   }
 
+const deleteUser = (req, res, db, bcrypt) => {
+
+    // delete user from login table and from users table
+    db.transaction(trx=> {
+        const {email, password} = req.body
+
+        return trx.select('hash').from('login').where('email','=', email).then(hash=> {
+            const isValid = bcrypt.compareSync(password, hash[0].hash);
+            if(isValid){
+                return trx.select('*').from('login').where('email', '=', email).del()
+                .then(()=> {
+                    return trx('users').select('*').from('users').where('email', '=', email).del()
+                })
+            } else {
+                res.status(400).json('unable to delete')
+            }
+        })
+        
+    })
+    .then(()=> {
+        res.status(200).json(`user have been deleted`)
+    })
+    .catch(err=> {
+        res.status(400).json(`something went wrong`)
+        console.error(err)
+    })
+      
+    
+ 
+   
+    
+}
+
 module.exports = {
     handleProfileGet,
-    handleRank
+    handleRank,
+    deleteUser,
 }
