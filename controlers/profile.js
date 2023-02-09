@@ -1,13 +1,17 @@
 const register = require('./register')
 const handleProfileGet =(req, res, db)=> {
-    const { name } = req.params;
+    const { username } = req.params;
     db.select('*').from('users').where({
-        name:  register.capitalizeFirstLetter(name)
+        name:  register.capitalizeFirstLetter(username)
     })
     .then(user => {
-        if(user.length) {
+        if(user.length == 1) {
+            console.log(user)
             res.json(user[0])
-        } else {
+        } else if (user.length > 1){
+            res.status(200).json(user)
+        }
+         else {
             res.status(400).json('Not Found')
         }})
     .catch(err => res.status(400).json('Error getting user'))      
@@ -46,7 +50,8 @@ const handleRank = (req, res, db) =>{
     })
     .returning("rank")
     .then(rank => {
-        res.json(rank)
+        console.log(rank[0])
+        res.json(rank[0])
         })
   }
 
