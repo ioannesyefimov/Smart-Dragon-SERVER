@@ -1,12 +1,7 @@
-
 const saltRounds = 10
+const Errors = require('../additional/Errors').Errors
 
-const Errors = {
-    INVALID_PASSWORD: `Password must be in English and contains at least one uppercase and lowercase character, one number, and one special character`,
-    PASSWORD_CONTAINS_NAME: `password must not contain users input`,
-    USER_EXIST: 'User already exists, try another username'
-    
-}
+
 
 function validatePassword(password,name) {
     // check whether password doesn't contains at least 
@@ -15,9 +10,12 @@ function validatePassword(password,name) {
     const password_rgx = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$/
 
     function kmpSearch(pattern, text) {
+      
         if (pattern.length == 0)
           return 0; // Immediate match
-      
+        // change inputs to lowercase so that comparing will be non-case-sensetive
+       pattern = pattern.toLowerCase()
+       text = text.toLowerCase()
         // Compute longest suffix-prefix table
         let lsp = [0]; // Base case
         for (let i = 1; i < pattern.length; i++) {
@@ -45,12 +43,14 @@ function validatePassword(password,name) {
     
       const hasNamePatternInPassword = kmpSearch(name, password)
 
-      const isValidPassword = password_rgx.test(password)
+      const isInValidPassword = password_rgx.test(password)
     
     if((hasNamePatternInPassword != -1) ){
         return Errors.PASSWORD_CONTAINS_NAME
-    } else if(isValidPassword === true) {
+    } else if(isInValidPassword === true) {
         return Errors.INVALID_PASSWORD
+    } else {
+      return `valid`
     }
     
 }
@@ -70,6 +70,7 @@ const handleRegister = (req, res, db, bcrypt) => {
         return res.status(400).json(JSON.stringify(Errors.PASSWORD_CONTAINS_NAME))
 
     }
+   
         db.transaction(trx=> {
         trx.insert({
             hash: hash,
@@ -93,10 +94,12 @@ const handleRegister = (req, res, db, bcrypt) => {
         .then(trx.commit)
         .catch(trx.rollback)
     })
-    .catch(err => res.status(400).json(Errors.USER_EXIST))
-    
+    .catch(err =>{
+      res.status(400).json(err)
+      })
 }
 
 module.exports = {
-    handleRegister: handleRegister,
+    handleRegister: handleRegister, validatePassword,
+    saltRounds
 }

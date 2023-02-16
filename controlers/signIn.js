@@ -17,12 +17,15 @@ const handleSignIn = (req, res, db, bcrypt)=>{
            .then(user => {
                res.json(user[0])
            })
-           .catch(err => res.status(400).json('unable to get user'))
-        } else {
-            res.status(400).json('wrong credentials')
+        } else if(!isValid) {
+            res.status(400).json('wrong password')
         }
+
+            
+            
+        
     })
-    .catch(err => res.status(400).json('wrong credentials'))
+    .catch(err => res.status(400).json('such user doesn\'t exist'))
     
 }
 
